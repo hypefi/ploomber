@@ -10,6 +10,19 @@ from ploomber.cli import cli
 from tests_util import assert_function_in_module, write_simple_pipeline
 
 
+@pytest.mark.parametrize('arg', [
+    'myproject',
+    'some/path/to/project',
+])
+def test_scaffold_pass_name_as_arg(tmp_directory, arg):
+    runner = CliRunner()
+    result = runner.invoke(scaffold, args=arg, catch_exceptions=False)
+
+    assert result.exit_code == 0
+    assert Path(arg).is_dir()
+    assert Path(arg, 'pipeline.yaml').is_file()
+
+
 @pytest.mark.parametrize('args, conda, package, empty', [
     [[], False, False, False],
     [['--conda'], True, False, False],
@@ -256,5 +269,17 @@ def test_error_if_conflicting_options(flag):
                            catch_exceptions=False)
 
     assert result.exit_code
-    assert (f'Error: -e/--entry-point is not compatible with the {flag} flag\n'
-            == result.output)
+    assert (f'Error: -e/--entry-point is not compatible with {flag}\n' ==
+            result.output)
+
+
+def test_error_if_entry_point_and_name():
+    runner = CliRunner()
+    result = runner.invoke(scaffold,
+                           args=['some-name', '-e', 'pipeline.serve.yaml'],
+                           catch_exceptions=False)
+
+    assert result.exit_code
+    expected = ('Error: -e/--entry-point is not compatible with '
+                'the "name" argument\n')
+    assert expected == result.output
