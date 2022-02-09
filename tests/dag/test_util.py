@@ -7,7 +7,7 @@ from ploomber import DAG
 from ploomber.tasks import PythonCallable, SQLScript
 from ploomber.products import (File, SQLRelation, SQLiteRelation,
                                GenericSQLRelation, PostgresRelation)
-from ploomber.exceptions import DAGRenderError, DAGWithDuplicatedProducts
+from ploomber.exceptions import DAGWithDuplicatedProducts
 
 
 def touch_root(product):
